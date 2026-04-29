@@ -76,7 +76,10 @@ class NBReceptionWorkspace {
                 <input id="nb-global-search" placeholder="Search patients or appointments..." autocomplete="off" />
                 <div id="nb-global-results" class="nb-global-results"></div>
               </div>
-              <button class="nb-btn nb-btn-primary" id="nb-new-patient">+ New Patient</button>
+              <div style="display:flex; gap:10px;">
+                <button class="nb-btn nb-btn-secondary" id="nb-header-book">Book Appt</button>
+                <button class="nb-btn nb-btn-primary" id="nb-new-patient">+ New Patient</button>
+              </div>
               <div class="nb-user-profile">
                 <div class="nb-avatar">${this.initials(frappe.session.user_fullname || "R")}</div>
               </div>
@@ -191,6 +194,7 @@ class NBReceptionWorkspace {
     });
 
     $("#nb-open-calendar").on("click", () => frappe.set_route("List", "Patient Appointment"));
+    $("#nb-header-book").on("click", () => this.book_appointment_dialog());
     $("#nb-register-walkin").on("click", () => this.register_walkin());
     $("#nb-new-patient").on("click", () => this.new_patient_dialog());
 
@@ -211,6 +215,10 @@ class NBReceptionWorkspace {
       if (!$(e.target).closest(".nb-search-bar").length) {
         $("#nb-global-results,#nb-patient-results").hide();
       }
+    });
+
+    $(this.wrapper).on("click", "#nb-preview-book", () => {
+      if (this.selected_patient) this.book_appointment_dialog(this.selected_patient.name);
     });
   }
 
@@ -331,13 +339,19 @@ class NBReceptionWorkspace {
               <td>${this.esc(row.practitioner_name || row.practitioner)}</td>
               <td><span class="nb-badge nb-badge-blue">${this.esc(row.status)}</span></td>
               <td>
-                <button class="nb-btn nb-btn-secondary btn-xs" data-action="check_in" data-name="${this.esc(row.name)}">Arrived</button>
+                <div style="display:flex; gap:5px;">
+                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="check_in" data-name="${this.esc(row.name)}">Arrived</button>
+                  <button class="nb-btn nb-btn-primary btn-xs" data-action="invoice" data-name="${this.esc(row.name)}">Invoice</button>
+                </div>
               </td>
             </tr>
           `).join("")}
         </tbody>
       </table>
     `);
+    $("#nb-queue-table [data-action]").on("click", (e) => {
+      this.queue_action($(e.currentTarget).data("action"), $(e.currentTarget).data("name"));
+    });
   }
 
   render_billing(tab = "pending") {
@@ -356,6 +370,7 @@ class NBReceptionWorkspace {
         <button class="nb-btn nb-btn-primary btn-xs" data-action="invoice" data-name="${this.esc(r.name)}">Invoice</button>
       </div>
     `).join(""));
+    $("#nb-billing-list [data-action='invoice']").on("click", (e) => this.queue_action("create_invoice", $(e.currentTarget).data("name")));
   }
 
   render_today_stats(data) {
@@ -404,9 +419,41 @@ class NBReceptionWorkspace {
             <div style="color:var(--nb-text-muted); font-size:12px;">${this.esc(p.name)}</div>
           </div>
         </div>
-        <button class="nb-btn nb-btn-primary w-100" onclick="frappe.set_route('Form', 'Patient', '${this.esc(p.name)}')">View Full Profile</button>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button class="nb-btn nb-btn-primary" id="nb-preview-book">Book Appt</button>
+          <button class="nb-btn nb-btn-secondary" onclick="frappe.set_route('Form', 'Patient', '${this.esc(p.name)}')">Profile</button>
+        </div>
       </div>
     `);
+  }
+
+  book_appointment_dialog(patient = null) {
+    const d = new frappe.ui.Dialog({
+      title: "Book Appointment",
+      fields: [
+        { fieldname: "patient", label: "Patient", fieldtype: "Link", options: "Patient", reqd: 1, default: patient },
+        { fieldname: "practitioner", label: "Doctor", fieldtype: "Link", options: "Healthcare Practitioner", reqd: 1 },
+        { fieldname: "appointment_date", label: "Date", fieldtype: "Date", reqd: 1, default: frappe.datetime.get_today() },
+        { fieldname: "appointment_time", label: "Time", fieldtype: "Time", reqd: 1 },
+        { fieldname: "notes", label: "Notes", fieldtype: "Small Text" },
+      ],
+      primary_action_label: "Book Now",
+      primary_action: (values) => {
+        this.call("book_appointment", values, () => {
+          d.hide();
+          frappe.show_alert({ message: "Appointment booked successfully", indicator: "green" });
+          this.load_all(false);
+        });
+      },
+    });
+    d.show();
+  }
+
+  queue_action(method, appointment) {
+    this.call(method, { appointment }, (res) => {
+      frappe.show_alert({ message: (res && res.message) || "Done", indicator: "green" });
+      this.load_all(false);
+    });
   }
 
   register_walkin() {
