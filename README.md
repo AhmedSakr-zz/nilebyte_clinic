@@ -23,26 +23,36 @@ The application uses a **Unified Premium Design System** to provide a consistent
 - **CSS Source**: `nilebyte_clinic/public/css/nb_clinic_ui.css`
 - **Injection**: Loaded globally via `app_include_css` in `hooks.py`.
 - **Typography**: Uses **Outfit** for headings and **Inter** for body/UI text.
-- **Design Tokens**: Standardized variables for colors (`--nb-primary`, `--nb-danger`), spacing, and shadows.
+- **Design Tokens**: Standardized variables for colors (`--nb-primary`, `--nb-danger`, `--nb-success`), spacing, and shadows.
 
 #### 2. Custom Workspaces (SPA Pages)
-All clinic-specific dashboards are built as Frappe Page components:
-- **Doctor Workspace**: `/doctor-workspace`
-- **Reception Workspace**: `/reception-workspace`
-- **Admin Dashboard**: `/clinic-admin-dashboard`
+The application provides a full suite of specialized clinical dashboards built as Frappe Page components:
+- **Doctor Workspace**: `/doctor-workspace` (Clinical notes, prescriptions, labs)
+- **Reception Workspace**: `/reception-workspace` (Appointments, walk-ins, billing)
+- **Nursing Station**: `/nursing-station` (Triage & Vital Signs collection)
+- **Laboratory Dashboard**: `/lab-dashboard` (Sample tracking & test result entry)
+- **Pharmacy Dashboard**: `/pharmacy-dashboard` (Medication dispensing & stock tracking)
+- **Admin Dashboard**: `/clinic-admin-dashboard` (Financial KPIs & system overview)
 
-These pages follow a standard HTML shell (`nb-clinic-app`) which includes a unified sidebar (`nb-sidebar`) and topbar (`nb-topbar`).
+All pages follow a standard HTML shell (`nb-clinic-app`) which includes a unified sidebar (`nb-sidebar`) and topbar (`nb-topbar`).
 
 #### 3. Workspace Redirection Logic
 To ensure users are always directed to the modern clinic UI instead of standard Frappe workspaces:
-- **Redirection Scripts**: `nilebyte_clinic/public/js/workspace_redirects.js` and `nb_redirects_v2.js`.
-- **Logic**: Automatically intercepts routes to standard "Workspaces" and redirects authorized roles (Doctor, Receptionist, Administrator) to their respective custom pages.
+- **Redirection Script**: `nilebyte_clinic/public/js/nb_redirects_v2.js`
+- **Logic**: Automatically intercepts routes and redirects based on user roles:
+    - **Doctor** -> Doctor Workspace
+    - **Receptionist / Cashier** -> Reception Workspace
+    - **Nurse** -> Nursing Station
+    - **Lab Technician** -> Lab Dashboard
+    - **Pharmacist** -> Pharmacy Dashboard
+    - **Clinic Admin** -> Admin Dashboard
 
 #### 4. Developer Guidelines
 When adding new features or workspaces:
 - **Do NOT** use inline styles or `add_styles()` in JS files.
 - **DO** use the shared classes defined in `nb_clinic_ui.css` (e.g., `.nb-card`, `.nb-btn`, `.nb-badge`).
-- **Layout**: Maintain the grid-based architecture to ensure responsiveness.
+- **Layout**: Maintain the grid-based architecture (`.nb-grid`) to ensure responsiveness.
+- **Backend**: Place backend logic in the `.py` file of the corresponding page to keep the dashboard self-contained.
 
 ### Contributing
 
@@ -53,8 +63,7 @@ cd apps/nilebyte_clinic
 pre-commit install
 ```
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
-
+Pre-commit is configured to use the following tools:
 - ruff
 - eslint
 - prettier
