@@ -68,18 +68,18 @@ class NBReceptionWorkspace {
           <header class="nb-topbar">
             <div class="nb-page-title">
               <h1>Reception Dashboard</h1>
-              <p>Clinic Operations Overview</p>
+              <p>Managing clinical front-desk operations</p>
             </div>
             <div class="nb-top-actions">
               <div class="nb-search-bar">
                 <span class="nb-search-icon">⌕</span>
                 <input id="nb-global-search" placeholder="Search patients or appointments..." autocomplete="off" />
-                <div id="nb-global-results" class="nb-global-results"></div>
+                <div id="nb-global-results" class="nb-global-results nb-quick-results"></div>
               </div>
-              <div style="display:flex; gap:10px;">
-                <button class="nb-btn nb-btn-secondary" id="nb-header-collect">Collect Payment</button>
-                <button class="nb-btn nb-btn-secondary" id="nb-header-book">Book Appt</button>
-                <button class="nb-btn nb-btn-primary" id="nb-new-patient">+ New Patient</button>
+              <div style="display:flex; gap:12px;">
+                <button class="nb-btn nb-btn-secondary" id="nb-header-collect">💳 Collect</button>
+                <button class="nb-btn nb-btn-secondary" id="nb-header-book">📅 Book</button>
+                <button class="nb-btn nb-btn-primary" id="nb-new-patient">＋ New Patient</button>
               </div>
               <div class="nb-user-profile">
                 <div class="nb-avatar">${this.initials(frappe.session.user_fullname || "R")}</div>
@@ -93,23 +93,27 @@ class NBReceptionWorkspace {
             <div class="nb-grid nb-grid-2">
               <section class="nb-card">
                 <div class="nb-card-header">
-                  <h3>Today's Schedule</h3>
+                  <h3>Schedule Highlights</h3>
                   <button class="nb-btn nb-btn-secondary btn-xs" id="nb-open-calendar">Full Calendar</button>
                 </div>
-                <div id="nb-calendar" class="nb-rw-calendar" style="height: 350px;"></div>
+                <div id="nb-calendar" class="nb-rw-calendar">
+                    <div class="nb-empty-soft">Calendar view is being updated...</div>
+                </div>
               </section>
 
-              <div class="nb-grid" style="gap: 20px;">
-                <section class="nb-card" style="margin: 0;">
-                  <div class="nb-card-header"><h3>Quick Patient Search</h3></div>
-                  <div class="nb-search-bar" style="width: 100%; margin: 16px;">
-                    <input id="nb-patient-search" placeholder="Search by name, phone, or ID..." autocomplete="off" />
+              <div class="nb-grid" style="gap: 24px;">
+                <section class="nb-card" style="margin: 0; padding: 24px;">
+                  <div class="nb-card-header" style="margin-bottom:16px; border:0;"><h3>Find Patient</h3></div>
+                  <div class="nb-search-bar" style="width: 100%;">
+                    <span class="nb-search-icon">🔍</span>
+                    <input id="nb-patient-search" placeholder="Name, phone, or patient ID..." autocomplete="off" />
                     <div id="nb-patient-results" class="nb-quick-results"></div>
                   </div>
                 </section>
                 <div id="nb-patient-preview">
-                    <div class="nb-card" style="margin: 0; display: flex; align-items: center; justify-content: center; min-height: 180px; color: var(--nb-text-muted);">
-                        Search for a patient to see details
+                    <div class="nb-card" style="margin: 0; display: flex; flex-direction:column; align-items: center; justify-content: center; min-height: 200px; color: var(--nb-text-muted); border: 2px dashed var(--nb-border); background: var(--nb-surface);">
+                        <span style="font-size: 32px; margin-bottom:10px;">👤</span>
+                        Select a patient to see details
                     </div>
                 </div>
               </div>
@@ -118,51 +122,51 @@ class NBReceptionWorkspace {
             <div class="nb-grid nb-grid-3">
               <section class="nb-card">
                 <div class="nb-card-header"><h3>Register Walk-In</h3></div>
-                <div class="nb-form-grid" style="padding: 16px;">
-                  <div style="margin-bottom: 15px;">
-                    <label style="display:block; margin-bottom: 5px; font-weight: 700;">Patient</label>
+                <div class="nb-form-grid">
+                  <div class="nb-form-group">
+                    <label>Patient</label>
                     <div id="nb-walkin-patient"></div>
                   </div>
-                  <div style="margin-bottom: 15px;">
-                    <label style="display:block; margin-bottom: 5px; font-weight: 700;">Doctor</label>
+                  <div class="nb-form-group">
+                    <label>Doctor</label>
                     <div id="nb-walkin-practitioner"></div>
                   </div>
-                  <button class="nb-btn nb-btn-primary w-100" id="nb-register-walkin">Register Now</button>
+                  <button class="nb-btn nb-btn-primary w-100" id="nb-register-walkin">🩺 Register & Queue</button>
                 </div>
               </section>
 
               <section class="nb-card">
                 <div class="nb-card-header">
                   <h3>Billing</h3>
-                  <div class="nb-tabs" style="padding: 0;">
-                    <button class="active" data-bill-tab="pending" style="font-size: 11px;">Pending</button>
-                    <button data-bill-tab="paid" style="font-size: 11px;">Paid</button>
+                  <div style="display:flex; background:var(--nb-surface); padding:4px; border-radius:10px; gap:4px;">
+                    <button class="nb-btn btn-xs nb-btn-secondary active" data-bill-tab="pending" style="border:0;">Pending</button>
+                    <button class="nb-btn btn-xs nb-btn-secondary" data-bill-tab="paid" style="border:0;">Paid</button>
                   </div>
                 </div>
-                <div id="nb-billing-list" style="padding: 16px;"></div>
+                <div id="nb-billing-list"></div>
               </section>
 
               <section class="nb-card">
-                <div class="nb-card-header"><h3>Today's Stats</h3></div>
-                <div id="nb-today-stats" style="padding: 16px;"></div>
+                <div class="nb-card-header"><h3>Daily Financials</h3></div>
+                <div id="nb-today-stats"></div>
               </section>
             </div>
 
             <section class="nb-card">
               <div class="nb-card-header">
                 <h3>Queue Management</h3>
-                <div class="nb-filter-bar">
-                  <button class="active" data-filter="all">All</button>
-                  <button data-filter="waiting">Waiting</button>
-                  <button data-filter="with_doctor">With Doctor</button>
-                  <button data-filter="completed">Completed</button>
+                <div style="display:flex; gap:8px;">
+                  <button class="nb-btn btn-xs nb-btn-secondary active" data-filter="all">All</button>
+                  <button class="nb-btn btn-xs nb-btn-secondary" data-filter="waiting">Waiting</button>
+                  <button class="nb-btn btn-xs nb-btn-secondary" data-filter="with_doctor">With Doctor</button>
+                  <button class="nb-btn btn-xs nb-btn-secondary" data-filter="completed">Completed</button>
                 </div>
               </div>
               <div id="nb-queue-table" class="nb-table-container"></div>
             </section>
           </div>
-          <div class="nb-last-updated" style="margin-top: 32px; opacity: 0.6; text-align: center;">
-            Last sync: <span id="nb-last-updated">--</span>
+          <div class="nb-last-updated" style="margin-top: 40px; opacity: 0.5; text-align: center; font-size: 13px;">
+            ✦ Cloud Sync Active • Last updated: <span id="nb-last-updated">--</span>
           </div>
         </main>
       </div>
@@ -200,15 +204,15 @@ class NBReceptionWorkspace {
     $("#nb-register-walkin").on("click", () => this.register_walkin());
     $("#nb-new-patient").on("click", () => this.new_patient_dialog());
 
-    $(".nb-tabs button").on("click", (e) => {
-      $(".nb-tabs button").removeClass("active");
-      $(e.currentTarget).addClass("active");
+    $("[data-bill-tab]").on("click", (e) => {
+      $("[data-bill-tab]").removeClass("active").css("background", "transparent");
+      $(e.currentTarget).addClass("active").css("background", "#ffffff");
       this.render_billing($(e.currentTarget).data("bill-tab"));
     });
 
-    $(".nb-filter-bar button").on("click", (e) => {
-      $(".nb-filter-bar button").removeClass("active");
-      $(e.currentTarget).addClass("active");
+    $("[data-filter]").on("click", (e) => {
+      $("[data-filter]").removeClass("active").removeClass("nb-btn-primary").addClass("nb-btn-secondary");
+      $(e.currentTarget).addClass("active").addClass("nb-btn-primary").removeClass("nb-btn-secondary");
       this.active_filter = $(e.currentTarget).data("filter");
       this.load_queue(true);
     });
@@ -273,9 +277,9 @@ class NBReceptionWorkspace {
     this.call("get_dashboard_stats", {}, (data) => {
       data = data || {};
       const cards = [
-        { label: "Today Appointments", value: data.today || 0, icon: "📅", color: "blue" },
+        { label: "Today Appts", value: data.today || 0, icon: "📅", color: "blue" },
         { label: "Waiting", value: data.waiting || 0, icon: "⏱", color: "orange" },
-        { label: "With Doctor", value: data.with_doctor || 0, icon: "👨‍⚕️", color: "sky" },
+        { label: "In Triage", value: data.with_nurse || 0, icon: "🧪", color: "sky" },
         { label: "Completed", value: data.completed || 0, icon: "✓", color: "green" },
       ];
       $("#nb-kpis").html(cards.map(c => `
@@ -293,33 +297,18 @@ class NBReceptionWorkspace {
 
   load_queue(show_loading = true) {
     if (show_loading) {
-      $("#nb-queue-table").html(`<div class="nb-empty-soft">Loading queue...</div>`);
+      $("#nb-queue-table").html(`<div class="nb-empty-soft">Updating queue...</div>`);
     }
     this.call("get_today_queue", { filter: this.active_filter }, (rows) => {
       this.queue_rows = rows || [];
       this.render_queue_table(this.queue_rows);
-      this.render_calendar(this.queue_rows);
-      this.render_billing($(".nb-tabs button.active").data("bill-tab") || "pending");
+      this.render_billing($("[data-bill-tab].active").data("bill-tab") || "pending");
     });
-  }
-
-  render_calendar(rows) {
-    const hours = ["09:00", "10:00", "11:00", "12:00", "13:00"];
-    $("#nb-calendar").html(`
-      <div style="display:flex; flex-direction:column; gap:10px; padding:15px;">
-        ${hours.map(h => `
-          <div style="display:flex; align-items:center; gap:15px; border-bottom:1px solid var(--nb-border); padding-bottom:5px;">
-            <span style="font-size:12px; color:var(--nb-text-muted); width:40px;">${h}</span>
-            <div style="flex:1; height:30px; background:var(--nb-surface); border-radius:4px;"></div>
-          </div>
-        `).join("")}
-      </div>
-    `);
   }
 
   render_queue_table(rows) {
     if (!rows.length) {
-      $("#nb-queue-table").html(`<div class="nb-empty-soft">No appointments found.</div>`);
+      $("#nb-queue-table").html(`<div class="nb-empty-soft">No active queue entries found for today.</div>`);
       return;
     }
     $("#nb-queue-table").html(`
@@ -336,15 +325,18 @@ class NBReceptionWorkspace {
         <tbody>
           ${rows.map(row => `
             <tr>
-              <td>${this.esc(row.time)}</td>
-              <td><b>${this.esc(row.patient_name || row.patient)}</b></td>
-              <td>${this.esc(row.practitioner_name || row.practitioner)}</td>
-              <td><span class="nb-badge nb-badge-blue">${this.esc(row.status)}</span></td>
+              <td><span style="color:var(--nb-primary); font-weight:700;">${this.esc(row.time)}</span></td>
               <td>
-                <div style="display:flex; gap:5px;">
-                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="mark_arrived" data-name="${this.esc(row.name)}">Arrived</button>
-                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="send_to_doctor" data-name="${this.esc(row.name)}">Send</button>
-                  <button class="nb-btn nb-btn-primary btn-xs" data-action="create_invoice" data-name="${this.esc(row.name)}">Invoice</button>
+                <div style="font-weight:700;">${this.esc(row.patient_name || row.patient)}</div>
+                <div style="font-size:11px; opacity:0.6;">${this.esc(row.patient)}</div>
+              </td>
+              <td>${this.esc(row.practitioner_name || row.practitioner)}</td>
+              <td><span class="nb-badge ${this.status_badge(row.status)}">${this.esc(row.status)}</span></td>
+              <td>
+                <div style="display:flex; gap:8px;">
+                  ${row.status === 'Arrived' ? '' : `<button class="nb-btn nb-btn-secondary btn-xs" data-action="mark_arrived" data-name="${this.esc(row.name)}">Check In</button>`}
+                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="send_to_doctor" data-name="${this.esc(row.name)}">Send to MD</button>
+                  ${row.invoice ? `<button class="nb-btn nb-btn-primary btn-xs" data-action="collect" data-invoice="${this.esc(row.invoice)}">Collect</button>` : `<button class="nb-btn nb-btn-primary btn-xs" data-action="create_invoice" data-name="${this.esc(row.name)}">Invoice</button>`}
                 </div>
               </td>
             </tr>
@@ -353,38 +345,60 @@ class NBReceptionWorkspace {
       </table>
     `);
     $("#nb-queue-table [data-action]").on("click", (e) => {
-      this.queue_action($(e.currentTarget).data("action"), $(e.currentTarget).data("name"));
+        const action = $(e.currentTarget).data("action");
+        if (action === "collect") {
+            this.collect_payment_dialog($(e.currentTarget).data("invoice"));
+        } else {
+            this.queue_action(action, $(e.currentTarget).data("name"));
+        }
     });
+  }
+
+  status_badge(status) {
+    if (status === "Arrived" || status === "With Doctor") return "nb-badge-blue";
+    if (status === "Completed") return "nb-badge-green";
+    if (status === "Pending") return "nb-badge-orange";
+    return "nb-badge-blue";
   }
 
   render_billing(tab = "pending") {
     let rows = this.queue_rows.filter(r => tab === "paid" ? r.payment_status === "Paid" : r.payment_status !== "Paid");
     rows = rows.slice(0, 5);
     if (!rows.length) {
-      $("#nb-billing-list").html(`<div class="nb-empty-soft">No records found.</div>`);
+      $("#nb-billing-list").html(`<div class="nb-empty-soft" style="padding:20px; border:0;">No records.</div>`);
       return;
     }
     $("#nb-billing-list").html(rows.map(r => `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--nb-border);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--nb-border);">
         <div>
-          <div style="font-weight:700;">${this.esc(r.patient_name || r.patient)}</div>
-          <div style="font-size:11px; color:var(--nb-text-muted);">${this.esc(r.name)}</div>
+          <div style="font-weight:700; font-size:14px;">${this.esc(r.patient_name || r.patient)}</div>
+          <div style="font-size:11px; color:var(--nb-text-muted);">${this.esc(r.name)} • ${this.esc(r.payment_status)}</div>
         </div>
         <div style="display:flex; gap:5px;">
-            ${r.invoice ? `<button class="nb-btn nb-btn-secondary btn-xs" data-action="collect" data-invoice="${this.esc(r.invoice)}">Collect</button>` : `<button class="nb-btn nb-btn-primary btn-xs" data-action="invoice" data-name="${this.esc(r.name)}">Invoice</button>`}
+            ${r.invoice ? `<button class="nb-btn nb-btn-primary btn-xs" data-action="collect" data-invoice="${this.esc(r.invoice)}">Collect</button>` : `<button class="nb-btn nb-btn-secondary btn-xs" data-action="create_invoice" data-name="${this.esc(r.name)}">Invoice</button>`}
         </div>
       </div>
     `).join(""));
-    $("#nb-billing-list [data-action='invoice']").on("click", (e) => this.queue_action("create_invoice", $(e.currentTarget).data("name")));
+    
+    $("#nb-billing-list [data-action='create_invoice']").on("click", (e) => this.queue_action("create_invoice", $(e.currentTarget).data("name")));
     $("#nb-billing-list [data-action='collect']").on("click", (e) => this.collect_payment_dialog($(e.currentTarget).data("invoice")));
   }
 
   render_today_stats(data) {
     $("#nb-today-stats").html(`
-      <div style="display:grid; gap:12px;">
-        <div style="display:flex; justify-content:space-between;"><span>Completed</span><b>${data.completed || 0}</b></div>
-        <div style="display:flex; justify-content:space-between;"><span>Waiting</span><b>${data.waiting || 0}</b></div>
-        <div style="display:flex; justify-content:space-between;"><span>Revenue</span><b>${this.format_currency(this.billing_summary.paid_today_amount || 0)}</b></div>
+      <div style="display:grid; gap:16px; padding:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--nb-border); padding-bottom:12px;">
+            <span style="font-weight:600; color:var(--nb-text-muted);">Paid Today</span>
+            <b style="font-size:18px; color:var(--nb-success);">${this.format_currency(this.billing_summary.paid_today_amount || 0)}</b>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--nb-border); padding-bottom:12px;">
+            <span style="font-weight:600; color:var(--nb-text-muted);">Pending Amount</span>
+            <b style="font-size:18px; color:var(--nb-warning);">${this.format_currency(this.billing_summary.unpaid_amount || 0)}</b>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:600; color:var(--nb-text-muted);">Total Invoices</span>
+            <b style="font-size:18px;">${this.billing_summary.total_invoices || 0}</b>
+        </div>
       </div>
     `);
   }
@@ -397,13 +411,13 @@ class NBReceptionWorkspace {
     }
     this.call("search_patient", { query }, (rows) => {
       if (!rows || !rows.length) {
-        $(target).html(`<div style="padding:10px;">No results</div>`).show();
+        $(target).html(`<div style="padding:16px; color:var(--nb-text-muted);">No results found</div>`).show();
         return;
       }
       $(target).html(rows.map(p => `
-        <div class="nb-global-item" data-patient="${this.esc(p.name)}" style="padding:10px; cursor:pointer; border-bottom:1px solid var(--nb-border);">
+        <div class="nb-global-item" data-patient="${this.esc(p.name)}">
           <b>${this.esc(p.patient_name || p.name)}</b>
-          <div style="font-size:11px; color:var(--nb-text-muted);">${this.esc(p.name)} - ${this.esc(p.mobile || "")}</div>
+          <div>${this.esc(p.name)} • ${this.esc(p.mobile || "No phone")}</div>
         </div>
       `).join("")).show();
       $(`${target} .nb-global-item`).on("click", (e) => {
@@ -417,17 +431,17 @@ class NBReceptionWorkspace {
 
   render_patient_preview(p) {
     $("#nb-patient-preview").html(`
-      <div class="nb-card" style="margin:0; padding:15px;">
-        <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px;">
-          <div class="nb-avatar">${this.initials(p.patient_name || p.name)}</div>
+      <div class="nb-card nb-fade-in" style="margin:0; padding:28px; border:1px solid var(--nb-primary-soft); background:linear-gradient(to bottom, #ffffff, var(--nb-surface));">
+        <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+          <div class="nb-avatar" style="width:64px; height:64px; font-size:24px; border-radius:20px;">${this.initials(p.patient_name || p.name)}</div>
           <div>
-            <div style="font-weight:800; font-size:16px;">${this.esc(p.patient_name || p.name)}</div>
-            <div style="color:var(--nb-text-muted); font-size:12px;">${this.esc(p.name)}</div>
+            <div style="font-weight:900; font-size:20px; font-family:'Outfit';">${this.esc(p.patient_name || p.name)}</div>
+            <div style="color:var(--nb-text-muted); font-size:13px; font-weight:600;">ID: ${this.esc(p.name)}</div>
           </div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <button class="nb-btn nb-btn-primary" id="nb-preview-book">Book Appt</button>
-          <button class="nb-btn nb-btn-secondary" onclick="frappe.set_route('Form', 'Patient', '${this.esc(p.name)}')">Profile</button>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <button class="nb-btn nb-btn-primary" id="nb-preview-book">📅 Book Appt</button>
+          <button class="nb-btn nb-btn-secondary" onclick="frappe.set_route('Form', 'Patient', '${this.esc(p.name)}')">👤 Profile</button>
         </div>
       </div>
     `);
@@ -435,15 +449,15 @@ class NBReceptionWorkspace {
 
   book_appointment_dialog(patient = null) {
     const d = new frappe.ui.Dialog({
-      title: "Book Appointment",
+      title: "Book Patient Appointment",
       fields: [
         { fieldname: "patient", label: "Patient", fieldtype: "Link", options: "Patient", reqd: 1, default: patient },
-        { fieldname: "practitioner", label: "Doctor", fieldtype: "Link", options: "Healthcare Practitioner", reqd: 1 },
+        { fieldname: "practitioner", label: "Healthcare Practitioner", fieldtype: "Link", options: "Healthcare Practitioner", reqd: 1 },
         { fieldname: "appointment_date", label: "Date", fieldtype: "Date", reqd: 1, default: frappe.datetime.get_today() },
         { fieldname: "appointment_time", label: "Time", fieldtype: "Time", reqd: 1 },
         { fieldname: "notes", label: "Notes", fieldtype: "Small Text" },
       ],
-      primary_action_label: "Book Now",
+      primary_action_label: "Confirm Booking",
       primary_action: (values) => {
         this.call("book_appointment", values, () => {
           d.hide();
@@ -457,11 +471,11 @@ class NBReceptionWorkspace {
 
   collect_payment_dialog(invoice = null) {
     const d = new frappe.ui.Dialog({
-      title: "Collect Payment",
+      title: "Collect Clinical Payment",
       fields: [
         { fieldname: "invoice", label: "Sales Invoice", fieldtype: "Link", options: "Sales Invoice", reqd: 1, default: invoice },
         { fieldname: "mode_of_payment", label: "Mode of Payment", fieldtype: "Link", options: "Mode of Payment", reqd: 1 },
-        { fieldname: "amount", label: "Amount", fieldtype: "Currency", reqd: 1 },
+        { fieldname: "amount", label: "Amount to Collect", fieldtype: "Currency", reqd: 1 },
         { fieldname: "reference", label: "Reference No", fieldtype: "Data" },
       ],
       primary_action_label: "Submit Payment",
@@ -469,9 +483,9 @@ class NBReceptionWorkspace {
         this.call("collect_payment", values, (res) => {
           d.hide();
           frappe.msgprint({
-            title: "Payment Collected",
+            title: "Success",
             indicator: "green",
-            message: `${this.esc(res.message)}<br><br><a class="btn btn-primary" href="/app/payment-entry/${encodeURIComponent(res.payment_entry)}">View Payment Entry</a>`,
+            message: `Payment Entry Created: <b>${this.esc(res.payment_entry)}</b>`,
           });
           this.load_all(false);
         });
@@ -482,7 +496,7 @@ class NBReceptionWorkspace {
 
   queue_action(method, appointment) {
     this.call(method, { appointment }, (res) => {
-      frappe.show_alert({ message: (res && res.message) || "Done", indicator: "green" });
+      frappe.show_alert({ message: (res && res.message) || "Action completed", indicator: "green" });
       this.load_all(false);
     });
   }
@@ -490,9 +504,11 @@ class NBReceptionWorkspace {
   register_walkin() {
     const patient = this.walkin_patient.get_value();
     const practitioner = this.walkin_practitioner.get_value();
-    if (!patient || !practitioner) return frappe.msgprint("Select patient and doctor");
+    if (!patient || !practitioner) return frappe.msgprint("Please select both patient and doctor.");
     this.call("add_walk_in", { patient, practitioner }, () => {
-      frappe.show_alert({ message: "Walk-in registered", indicator: "green" });
+      frappe.show_alert({ message: "Walk-in registration successful", indicator: "green" });
+      this.walkin_patient.set_value("");
+      this.walkin_practitioner.set_value("");
       this.load_all(false);
     });
   }
