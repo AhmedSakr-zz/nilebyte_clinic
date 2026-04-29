@@ -1,6 +1,9 @@
 ### NileByte Clinic
 
-NileByte clinic-specific features for ClinicWiser tenants
+NileByte clinic-specific features for ClinicWiser tenants. 
+
+**About this App:**
+This is a custom Frappe app used to add specific business functionality and features to our Frappe server. By maintaining these custom features in this app, we can easily install it on any newly created site (e.g., new ClinicWiser tenants) to instantly provision our business logic and extensions.
 
 ### Installation
 
