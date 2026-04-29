@@ -1,24 +1,44 @@
-$(document).ready(function() {
-    // Intercept clicks on the sidebar items to instantly redirect to our Custom Pages
-    // instead of loading the empty Workspace.
-    $(document).on('click', '.standard-sidebar-item, .sidebar-item-container, .desk-sidebar-item', function(e) {
-        let item_label = $(this).text().trim();
+// More robust version using Frappe's built-in Router events
+frappe.router.on('change', () => {
+    const route = frappe.get_route();
+    
+    // Check if we are landing on a Workspace that should be a Page
+    // Frappe routes for Workspaces usually look like ["Workspace", "Doctor Workspace"] 
+    // or just ["doctor-workspace"] depending on the version.
+    
+    if (route) {
+        const route_str = route.join('/');
         
-        if (item_label === 'Doctor Workspace') {
+        // Match both the Workspace route and the direct slug
+        if (route_str === 'Workspace/Doctor Workspace' || route_str === 'doctor-workspace-workspace') {
+            frappe.set_route('doctor-workspace');
+        } 
+        else if (route_str === 'Workspace/Reception Workspace' || route_str === 'reception-workspace-workspace') {
+            frappe.set_route('reception-workspace');
+        } 
+        else if (route_str === 'Workspace/Clinic Admin Dashboard' || route_str === 'clinic-admin-dashboard-workspace') {
+            frappe.set_route('clinic-admin-dashboard');
+        }
+    }
+});
+
+// Also keep the click interceptor as a backup, but make it more flexible
+$(document).ready(function() {
+    $(document).on('click', '.sidebar-item-container, .standard-sidebar-item', function(e) {
+        const label = $(this).text().trim();
+        
+        if (label.includes('Doctor Workspace')) {
             e.preventDefault();
-            e.stopPropagation();
             frappe.set_route('doctor-workspace');
             return false;
         }
-        else if (item_label === 'Reception Workspace') {
+        if (label.includes('Reception Workspace')) {
             e.preventDefault();
-            e.stopPropagation();
             frappe.set_route('reception-workspace');
             return false;
         }
-        else if (item_label === 'Clinic Admin Dashboard') {
+        if (label.includes('Clinic Admin Dashboard')) {
             e.preventDefault();
-            e.stopPropagation();
             frappe.set_route('clinic-admin-dashboard');
             return false;
         }
