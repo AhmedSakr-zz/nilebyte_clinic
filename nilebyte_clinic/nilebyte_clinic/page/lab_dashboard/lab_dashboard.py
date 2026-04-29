@@ -8,19 +8,44 @@ def get_lab_dashboard():
         "tests": get_lab_tests(),
     }
 
+def has_field(doctype, fieldname):
+    return frappe.db.has_column(doctype, fieldname)
+
 def get_stats():
-    return {
-        "requested": frappe.db.count("Lab Test", {"status": "Requested"}),
-        "collected": frappe.db.count("Lab Test", {"status": "Sample Collected"}),
-        "completed_today": frappe.db.count("Lab Test", {"status": "Completed", "result_date": nowdate()}),
-    }
+    stats = {"requested": 0, "collected": 0, "completed_today": 0}
+    if not frappe.db.exists("DocType", "Lab Test"):
+        return stats
+        
+    stats["requested"] = frappe.db.count("Lab Test", {"status": "Requested"})
+    stats["collected"] = frappe.db.count("Lab Test", {"status": "Sample Collected"})
+    
+    # Defensive check for completed today
+    filters = {"status": "Completed"}
+    for f in ["result_date", "posting_date", "date", "creation"]:
+        if has_field("Lab Test", f):
+            if f == "creation":
+                filters[f] = [">", nowdate()]
+            else:
+                filters[f] = nowdate()
+            break
+    stats["completed_today"] = frappe.db.count("Lab Test", filters)
+    
+    return stats
 
 @frappe.whitelist()
 def get_lab_tests():
+    if not frappe.db.exists("DocType", "Lab Test"):
+        return []
+        
+    fields = ["name", "patient", "patient_name", "status"]
+    for f in ["lab_test_name", "request_date", "practitioner_name"]:
+        if has_field("Lab Test", f):
+            fields.append(f)
+            
     return frappe.get_all(
         "Lab Test",
         filters={"status": ["in", ["Requested", "Sample Collected"]]},
-        fields=["name", "patient", "patient_name", "lab_test_name", "status", "request_date", "practitioner_name"],
+        fields=fields,
         order_by="creation desc"
     )
 
@@ -36,10 +61,11 @@ def submit_result(test_id, result_data):
     result_data = frappe.parse_json(result_data)
     test = frappe.get_doc("Lab Test", test_id)
     
-    # In standard Frappe Health, Lab Test has a child table 'normal_values' 
-    # where results are stored. We'll try to update it or the main result field.
-    test.result_date = nowdate()
-    test.result_time = nowtime()
+    if has_field("Lab Test", "result_date"):
+        test.result_date = nowdate()
+    if has_field("Lab Test", "result_time"):
+        test.result_time = nowtime()
+        
     test.status = "Completed"
     
     # Simple result entry if no child table is used or for custom fields
@@ -48,7 +74,10 @@ def submit_result(test_id, result_data):
     
     # If the user provided a summary/note
     if result_data.get("notes"):
-        test.lab_test_comment = result_data.get("notes")
+        if hasattr(test, "lab_test_comment"):
+            test.lab_test_comment = result_data.get("notes")
+        elif hasattr(test, "remarks"):
+            test.remarks = result_data.get("notes")
         
     test.save(ignore_permissions=True)
     test.submit()

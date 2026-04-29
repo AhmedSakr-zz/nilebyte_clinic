@@ -8,11 +8,29 @@ def get_nursing_dashboard():
         "queue": get_triage_queue(),
     }
 
+def has_field(doctype, fieldname):
+    return frappe.db.has_column(doctype, fieldname)
+
 def get_stats():
-    return {
+    stats = {
         "waiting": frappe.db.count("Patient Appointment", {"status": "Arrived", "appointment_date": nowdate()}),
-        "completed": frappe.db.count("Vital Signs", {"docstatus": 1, "posting_date": nowdate()}),
+        "completed": 0
     }
+    
+    # Defensive check for Vital Signs stats
+    if frappe.db.exists("DocType", "Vital Signs"):
+        filters = {"docstatus": 1}
+        # Try different date fields
+        for f in ["posting_date", "date", "creation"]:
+            if has_field("Vital Signs", f):
+                if f == "creation":
+                    filters[f] = [">", nowdate()]
+                else:
+                    filters[f] = nowdate()
+                break
+        stats["completed"] = frappe.db.count("Vital Signs", filters)
+        
+    return stats
 
 @frappe.whitelist()
 def get_triage_queue():
@@ -36,27 +54,41 @@ def save_vitals(appointment, patient, vitals):
     if frappe.db.exists("DocType", "Vital Signs"):
         vs = frappe.new_doc("Vital Signs")
         vs.patient = patient
-        vs.appointment = appointment
-        vs.posting_date = nowdate()
-        vs.posting_time = nowtime()
+        if has_field("Vital Signs", "appointment"):
+            vs.appointment = appointment
+            
+        if has_field("Vital Signs", "posting_date"):
+            vs.posting_date = nowdate()
+        elif has_field("Vital Signs", "date"):
+            vs.date = nowdate()
+            
+        if has_field("Vital Signs", "posting_time"):
+            vs.posting_time = nowtime()
         
         # Map fields
-        vs.bp = vitals.get("bp")
-        vs.pulse = vitals.get("pulse")
-        vs.temperature = vitals.get("temperature")
-        vs.weight = vitals.get("weight")
-        vs.height = vitals.get("height")
-        vs.spo2 = vitals.get("spo2")
-        vs.bmi = vitals.get("bmi")
+        field_map = {
+            "bp": ["bp", "blood_pressure"],
+            "pulse": ["pulse"],
+            "temperature": ["temperature", "temp"],
+            "weight": ["weight"],
+            "height": ["height"],
+            "spo2": ["spo2"],
+            "bmi": ["bmi"]
+        }
+        
+        for key, targets in field_map.items():
+            val = vitals.get(key)
+            if val:
+                for t in targets:
+                    if has_field("Vital Signs", t):
+                        vs.set(t, val)
+                        break
         
         vs.insert(ignore_permissions=True)
         vs.submit()
         
-        # Optional: Mark appointment as "Triage Completed" if such status exists
-        # For now, we'll just return success
         return {"message": "Vitals saved and submitted", "name": vs.name}
     else:
-        # Fallback: Save to a note or a custom field if Vital Signs is missing
         return {"message": "Vital Signs DocType not found. Vitals not saved."}
 
 @frappe.whitelist()
