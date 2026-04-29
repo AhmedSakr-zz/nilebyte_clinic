@@ -23,187 +23,306 @@ class NBClinicAdminDashboard {
 
   render() {
     $(this.page.body).html(`
-      <div class="nb-admin-app">
-        <aside class="nb-admin-sidebar">
-          <div class="nb-admin-brand">
-            <div class="nb-admin-logo">✦</div>
-            <div class="nb-admin-brand-name">Medica Clinic</div>
+      <div class="nb-clinic-app">
+        <aside class="nb-sidebar">
+          <div class="nb-brand">
+            <div class="nb-brand-logo">✦</div>
+            <div class="nb-brand-text">
+              <div class="nb-brand-title">ClinicWiser</div>
+              <div class="nb-brand-sub">Admin Portal</div>
+            </div>
           </div>
-          <nav class="nb-admin-nav">
-            <button class="active" data-route="clinic-admin-dashboard"><span>⌂</span> Dashboard</button>
-            <button data-route="clinic-reports"><span>▥</span> Reports</button>
-            <button data-route="List/Healthcare Practitioner"><span>☷</span> Staff Management</button>
-            <button data-route="List/Item"><span>▣</span> Inventory</button>
-            <button data-route="List/Sales Invoice"><span>▰</span> Billing</button>
-            <button data-route="List/Patient Appointment"><span>▦</span> Appointments</button>
-            <button data-route="List/Patient"><span>▣</span> Patient Records</button>
-            <button data-action="settings"><span>⚙</span> Settings</button>
+          <nav class="nb-nav">
+            <button class="nb-nav-item active" data-route="clinic-admin-dashboard">
+              <span class="nb-nav-icon">⌂</span>
+              <span class="nb-nav-text">Dashboard</span>
+            </button>
+            <button class="nb-nav-item" data-route="clinic-reports">
+              <span class="nb-nav-icon">▥</span>
+              <span class="nb-nav-text">Reports</span>
+            </button>
+            <button class="nb-nav-item" data-route="List/Healthcare Practitioner">
+              <span class="nb-nav-icon">👥</span>
+              <span class="nb-nav-text">Staff</span>
+            </button>
+            <button class="nb-nav-item" data-route="List/Item">
+              <span class="nb-nav-icon">📦</span>
+              <span class="nb-nav-text">Inventory</span>
+            </button>
+            <button class="nb-nav-item" data-route="List/Sales Invoice">
+              <span class="nb-nav-icon">💳</span>
+              <span class="nb-nav-text">Billing</span>
+            </button>
+            <button class="nb-nav-item" data-action="settings">
+              <span class="nb-nav-icon">⚙</span>
+              <span class="nb-nav-text">Settings</span>
+            </button>
           </nav>
         </aside>
 
-        <main class="nb-admin-shell">
-          <header class="nb-admin-topbar">
-            <div class="nb-admin-search">
-              <span>⌕</span>
-              <input id="nb-admin-search" placeholder="Search..." autocomplete="off" />
-              <div id="nb-admin-search-results" class="nb-admin-search-results"></div>
+        <main class="nb-main">
+          <header class="nb-topbar">
+            <div class="nb-page-title">
+              <h1>Clinic Administration</h1>
+              <p>Global Performance Overview</p>
             </div>
-            <div class="nb-admin-user">
-              <div class="nb-admin-icon">🔔</div>
-              <div class="nb-admin-icon">✉<b>5</b></div>
-              <div class="nb-admin-avatar">AD</div>
-              <div>
-                <strong>${this.esc(frappe.session.user_fullname || frappe.session.user || "Clinic Administrator")}</strong>
-                <small>Clinic Administrator</small>
+            <div class="nb-top-actions">
+              <div class="nb-search-bar">
+                <span class="nb-search-icon">⌕</span>
+                <input id="nb-admin-search" placeholder="Search records..." autocomplete="off" />
+                <div id="nb-admin-search-results" class="nb-admin-search-results"></div>
               </div>
-              <span>⌄</span>
+              <div class="nb-user-profile">
+                <div class="nb-avatar">AD</div>
+              </div>
             </div>
           </header>
 
-          <section class="nb-admin-content">
-            <div id="nb-admin-kpis" class="nb-admin-kpis"></div>
+          <div class="nb-content nb-fade-in">
+            <div id="nb-admin-kpis" class="nb-kpis"></div>
 
-            <div class="nb-admin-grid nb-admin-grid-main">
-              <section class="nb-admin-card nb-admin-financial">
-                <div class="nb-admin-card-head"><h3>Financial Overview</h3><span>•••</span></div>
-                <div class="nb-admin-tabs">
-                  <button class="active" data-chart="revenue">Revenue</button>
-                  <button data-chart="expenses">Expenses</button>
+            <div class="nb-grid nb-grid-2">
+              <section class="nb-card">
+                <div class="nb-card-header">
+                  <h3>Financial Overview</h3>
+                  <div class="nb-tabs" style="padding: 0;">
+                    <button class="active" data-chart="revenue">Revenue</button>
+                    <button data-chart="expenses">Expenses</button>
+                  </div>
                 </div>
-                <div id="nb-admin-chart" class="nb-admin-chart"><div class="nb-admin-empty">Loading chart...</div></div>
+                <div id="nb-admin-chart" style="height: 300px; padding: 20px;">
+                  <div class="nb-empty-soft">Loading chart...</div>
+                </div>
               </section>
 
-              <section class="nb-admin-card">
-                <div class="nb-admin-card-head"><h3>Facility Stats</h3><span>•••</span></div>
-                <div id="nb-admin-facility"><div class="nb-admin-empty">Loading facility stats...</div></div>
-              </section>
-            </div>
-
-            <div class="nb-admin-grid nb-admin-quick-row" id="nb-admin-quick-cards"></div>
-
-            <div class="nb-admin-grid nb-admin-bottom-grid">
-              <section class="nb-admin-card">
-                <div class="nb-admin-card-head"><h3>Recent Activities</h3><span>•••</span></div>
-                <div id="nb-admin-activities"></div>
-              </section>
-
-              <section class="nb-admin-card">
-                <div class="nb-admin-card-head"><h3>System Settings</h3><span>•••</span></div>
-                <div id="nb-admin-settings"></div>
-              </section>
-
-              <section class="nb-admin-card">
-                <div class="nb-admin-card-head"><h3>My Tasks</h3><span>•••</span></div>
-                <div id="nb-admin-tasks"></div>
-              </section>
-
-              <section class="nb-admin-card">
-                <div class="nb-admin-card-head"><h3>Reports & Analytics</h3><span>•••</span></div>
-                <div id="nb-admin-reports"></div>
-                <div class="nb-admin-note-actions"><button id="nb-admin-open-reports">Open Reports Workspace</button></div>
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>Facility Status</h3></div>
+                <div id="nb-admin-facility" style="padding: 20px;"></div>
               </section>
             </div>
-          </section>
+
+            <div id="nb-admin-quick-cards" class="nb-grid nb-grid-3"></div>
+
+            <div class="nb-grid nb-grid-3">
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>Recent Activities</h3></div>
+                <div id="nb-admin-activities" class="nb-table-container"></div>
+              </section>
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>Active Tasks</h3></div>
+                <div id="nb-admin-tasks" class="nb-table-container"></div>
+              </section>
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>System Status</h3></div>
+                <div id="nb-admin-settings" class="nb-table-container"></div>
+              </section>
+            </div>
+          </div>
         </main>
       </div>
-    `);
-    this.add_styles();
-  }
-
-  add_styles() {
-    if ($("#nb-admin-style").length) return;
-    $("head").append(`
-      <style id="nb-admin-style">
-        body[data-route="clinic-admin-dashboard"] .layout-main-section-wrapper,
-        body[data-route="clinic-admin-dashboard"] .layout-main-section { padding:0 !important; margin:0 !important; }
-        .nb-admin-app { --blue:#075cc6; --blue2:#1d71d5; --deep:#0b2454; --muted:#667899; --line:#dbe5f2; --soft:#f4f8fd; display:flex; min-height:calc(100vh - 92px); margin:-15px -15px 0; background:#eef4fb; color:#0f2447; font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-        .nb-admin-sidebar { width:235px; flex:0 0 235px; background:linear-gradient(180deg,#0962c8,#074fb1); color:#fff; box-shadow:8px 0 24px rgba(8,65,140,.18); }
-        .nb-admin-brand { height:86px; display:flex; align-items:center; gap:12px; padding:0 28px; border-bottom:1px solid rgba(255,255,255,.13); }
-        .nb-admin-logo { width:38px; height:38px; display:grid; place-items:center; font-size:24px; font-weight:900; }
-        .nb-admin-brand-name { font-size:21px; font-weight:800; white-space:nowrap; }
-        .nb-admin-nav { padding:18px 14px; display:flex; flex-direction:column; gap:6px; }
-        .nb-admin-nav button { border:0; background:transparent; color:#fff; text-align:left; padding:13px 16px; border-radius:8px; display:flex; gap:14px; align-items:center; font-size:15px; font-weight:750; opacity:.95; }
-        .nb-admin-nav button:hover, .nb-admin-nav button.active { background:rgba(255,255,255,.15); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
-        .nb-admin-nav span { width:24px; font-size:22px; display:inline-grid; place-items:center; }
-        .nb-admin-shell { flex:1; min-width:0; }
-        .nb-admin-topbar { height:86px; display:flex; align-items:center; justify-content:space-between; padding:0 34px; background:linear-gradient(90deg,#085bc4,#0756ba,#0c62c9); box-shadow:0 3px 16px rgba(20,70,130,.2); }
-        .nb-admin-search { position:relative; width:min(620px,50vw); height:48px; background:#f9fbff; border:1px solid rgba(255,255,255,.65); border-radius:8px; display:flex; align-items:center; gap:12px; padding:0 14px; box-shadow:0 8px 20px rgba(0,0,0,.12) inset, 0 6px 18px rgba(0,0,0,.07); }
-        .nb-admin-search span { color:#486386; font-size:28px; line-height:1; }
-        .nb-admin-search input { border:0; outline:0; background:transparent; width:100%; font-size:15px; color:#1f365a; }
-        .nb-admin-search-results { display:none; position:absolute; top:53px; left:0; right:0; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; z-index:100; box-shadow:0 16px 36px rgba(20,50,90,.22); }
-        .nb-admin-search-item { padding:12px 14px; border-bottom:1px solid #eef3fa; cursor:pointer; }
-        .nb-admin-search-item:hover { background:#f4f8ff; }
-        .nb-admin-user { display:flex; align-items:center; gap:12px; color:#fff; }
-        .nb-admin-user strong { display:block; font-size:15px; line-height:1.1; }
-        .nb-admin-user small { display:block; color:#dbe9ff; font-size:12px; margin-top:3px; }
-        .nb-admin-avatar { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; background:#fff; color:#075cc6; font-weight:900; border:3px solid rgba(255,255,255,.55); box-shadow:0 5px 15px rgba(0,0,0,.18); }
-        .nb-admin-icon { position:relative; font-size:23px; }
-        .nb-admin-icon b { position:absolute; right:-9px; top:-9px; background:#f04b46; color:#fff; border-radius:99px; min-width:18px; height:18px; padding:0 4px; font-size:11px; display:grid; place-items:center; }
-        .nb-admin-content { padding:18px 28px 34px; }
-        .nb-admin-kpis { display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:16px; margin-bottom:16px; }
-        .nb-admin-kpi { color:#fff; min-height:86px; border-radius:4px; padding:18px 22px; box-shadow:0 8px 18px rgba(25,55,100,.16); display:flex; align-items:center; gap:18px; cursor:pointer; transition:.15s ease; }
-        .nb-admin-kpi:hover { transform:translateY(-1px); box-shadow:0 12px 26px rgba(25,55,100,.22); }
-        .nb-admin-kpi-icon { font-size:34px; width:42px; text-align:center; }
-        .nb-admin-kpi h4 { margin:0 0 4px; color:#fff; font-size:15px; font-weight:800; opacity:.95; }
-        .nb-admin-kpi b { display:block; font-size:29px; line-height:1; }
-        .nb-admin-kpi small { display:block; margin-top:6px; color:#fff; opacity:.9; }
-        .nb-admin-blue { background:linear-gradient(135deg,#3d8af2,#2a66d2); }
-        .nb-admin-red { background:linear-gradient(135deg,#ef625b,#dc4740); }
-        .nb-admin-green { background:linear-gradient(135deg,#4dab6b,#2f8d51); }
-        .nb-admin-orange { background:linear-gradient(135deg,#ffb144,#f39b20); }
-        .nb-admin-card { background:#fff; border:1px solid var(--line); border-radius:5px; box-shadow:0 6px 18px rgba(25,55,100,.09); overflow:hidden; }
-        .nb-admin-card-head { min-height:54px; padding:0 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; }
-        .nb-admin-card-head h3 { margin:0; font-size:18px; font-weight:850; color:#0c2146; }
-        .nb-admin-card-head span { color:#9aabc2; font-size:24px; letter-spacing:2px; }
-        .nb-admin-grid { display:grid; gap:14px; }
-        .nb-admin-grid-main { grid-template-columns:2fr 1.05fr; align-items:start; }
-        .nb-admin-quick-row { grid-template-columns:1fr 1fr 1fr; margin-top:14px; }
-        .nb-admin-bottom-grid { grid-template-columns:1.35fr .9fr 1fr 1fr; margin-top:14px; align-items:start; }
-        .nb-admin-tabs { display:flex; padding:18px 20px 0; }
-        .nb-admin-tabs button { border:1px solid var(--line); background:#eef3fb; padding:8px 22px; color:#3f5a85; font-weight:800; }
-        .nb-admin-tabs button:first-child { border-radius:4px 0 0 4px; }
-        .nb-admin-tabs button:last-child { border-radius:0 4px 4px 0; }
-        .nb-admin-tabs button.active { background:#fff; color:#0c2146; box-shadow:0 2px 5px rgba(20,50,90,.08); }
-        .nb-admin-chart { padding:16px 20px 18px; min-height:220px; }
-        .nb-admin-bars { height:180px; display:flex; align-items:flex-end; gap:16px; border-top:1px solid #e6edf7; border-bottom:1px solid #e6edf7; background:repeating-linear-gradient(to top,#fff,#fff 35px,#eef3fa 36px); padding:0 18px 18px; }
-        .nb-admin-bar-wrap { flex:1; min-width:35px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:5px; }
-        .nb-admin-bar { width:28px; border-radius:3px 3px 0 0; background:linear-gradient(180deg,#7badf3,#3f7ed8); min-height:6px; box-shadow:0 5px 12px rgba(40,90,160,.18); }
-        .nb-admin-bar.expense { background:linear-gradient(180deg,#ff9087,#ea5b51); opacity:.85; }
-        .nb-admin-bar-label { font-size:12px; color:#546887; white-space:nowrap; }
-        .nb-admin-facility-patient { margin:16px; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:#f8fbff; }
-        .nb-admin-patient-top { display:grid; grid-template-columns:70px 1fr; gap:14px; padding:18px; align-items:center; }
-        .nb-admin-patient-avatar { width:58px; height:58px; border-radius:50%; background:linear-gradient(135deg,#d8e7fb,#fff); display:grid; place-items:center; color:#2768bd; font-weight:900; font-size:22px; border:2px solid #fff; box-shadow:0 4px 12px rgba(20,50,90,.12); }
-        .nb-admin-patient-name { font-size:21px; font-weight:900; color:#10284d; }
-        .nb-admin-patient-id { color:#446188; margin-top:4px; }
-        .nb-admin-patient-meta { border-top:1px solid var(--line); padding:14px 18px; font-weight:750; }
-        .nb-admin-patient-actions { display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--line); }
-        .nb-admin-patient-actions button { border:0; background:#fff; border-right:1px solid var(--line); padding:12px 8px; color:#2768bd; font-weight:850; }
-        .nb-admin-patient-actions button:last-child { border-right:0; }
-        .nb-admin-quick-card { background:#fff; border:1px solid var(--line); border-radius:5px; padding:18px 18px 16px; min-height:128px; box-shadow:0 6px 18px rgba(25,55,100,.09); }
-        .nb-admin-quick-title { display:flex; align-items:center; gap:12px; font-size:18px; font-weight:900; color:#10284d; padding-bottom:14px; border-bottom:1px solid var(--line); }
-        .nb-admin-quick-title span { font-size:30px; color:#1466c5; }
-        .nb-admin-quick-actions { display:flex; gap:10px; align-items:center; justify-content:center; padding-top:16px; }
-        .nb-admin-primary-btn, .nb-admin-green-btn { border:0; color:#fff; border-radius:4px; font-weight:850; padding:9px 30px; box-shadow:0 4px 10px rgba(20,70,140,.18); }
-        .nb-admin-primary-btn { background:#1466d3; }
-        .nb-admin-green-btn { background:#40a865; }
-        .nb-admin-list-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); cursor:pointer; }
-        .nb-admin-list-row:hover { background:#f8fbff; }
-        .nb-admin-list-row:last-child { border-bottom:0; }
-        .nb-admin-list-title { font-weight:850; color:#10284d; }
-        .nb-admin-list-sub { color:var(--muted); font-size:12px; margin-top:3px; }
-        .nb-admin-row-left { display:flex; align-items:center; gap:12px; min-width:0; }
-        .nb-admin-row-icon { width:32px; height:32px; border-radius:8px; display:grid; place-items:center; background:#eaf3ff; color:#1766c3; font-size:18px; flex:0 0 32px; }
-        .nb-admin-tag { color:#d85c50; font-weight:850; white-space:nowrap; }
-        .nb-admin-note-actions { border-top:1px solid var(--line); padding:10px 14px; text-align:right; }
-        .nb-admin-note-actions button { border:0; background:#1466d3; color:#fff; border-radius:4px; padding:8px 16px; font-weight:850; }
-        .nb-admin-empty { color:var(--muted); text-align:center; padding:30px; }
-        @media(max-width:1250px){ .nb-admin-sidebar{width:86px;flex-basis:86px}.nb-admin-brand-name,.nb-admin-nav button{font-size:0}.nb-admin-nav span{font-size:24px}.nb-admin-kpis{grid-template-columns:repeat(2,1fr)}.nb-admin-grid-main,.nb-admin-bottom-grid{grid-template-columns:1fr}.nb-admin-quick-row{grid-template-columns:1fr}.nb-admin-search{width:48vw} }
-        @media(max-width:760px){ .nb-admin-app{display:block;margin:0}.nb-admin-sidebar{display:none}.nb-admin-topbar{height:auto;gap:12px;flex-direction:column;align-items:stretch;padding:12px}.nb-admin-search{width:100%}.nb-admin-content{padding:12px}.nb-admin-kpis{grid-template-columns:1fr}.nb-admin-user{justify-content:flex-end}.nb-admin-patient-actions{grid-template-columns:1fr} }
-      </style>
     `);
   }
 
   bind_events() {
+    $(this.wrapper).on("click", ".nb-nav-item", (e) => {
+      const $btn = $(e.currentTarget);
+      $(".nb-nav-item").removeClass("active");
+      $btn.addClass("active");
+      const route = $btn.data("route");
+      const action = $btn.data("action");
+      if (route) this.go_route(route);
+      if (action === "settings") this.open_settings();
+    });
+
+    $(this.wrapper).on("click", "[data-admin-route]", (e) => {
+      const route = $(e.currentTarget).attr("data-admin-route");
+      this.go_route(route);
+    });
+
+    $("#nb-admin-search").on("input", () => {
+      clearTimeout(this.search_timer);
+      const query = $("#nb-admin-search").val().trim();
+      this.search_timer = setTimeout(() => this.search_global(query), 250);
+    });
+
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest(".nb-search-bar").length) {
+        $("#nb-admin-search-results").hide();
+      }
+    });
+  }
+
+  call(method, args, callback) {
+    frappe.call({
+      method: `${this.method_base}.${method}`,
+      args: args || {},
+      freeze: false,
+      callback: (r) => callback && callback(r.message),
+      error: () => frappe.show_alert({ message: `Failed to load ${method}`, indicator: "red" }),
+    });
+  }
+
+  load_dashboard() {
+    this.call("get_admin_dashboard", { days: 30 }, (data) => {
+      this.dashboard = data || {};
+      this.render_kpis(this.dashboard.kpis || {});
+      this.render_chart(this.dashboard.chart || {});
+      this.render_facility(this.dashboard.facility || {});
+      this.render_quick_cards(this.dashboard.quick_cards || []);
+      this.render_list("#nb-admin-activities", this.dashboard.recent_activities || []);
+      this.render_list("#nb-admin-settings", this.dashboard.settings || []);
+      this.render_list("#nb-admin-tasks", this.dashboard.tasks || []);
+    });
+  }
+
+  render_kpis(k) {
+    const cards = [
+      { label: "Total Patients", value: this.num(k.total_patients), icon: "👤", color: "blue", route: "List/Patient" },
+      { label: "Revenue", value: `EGP ${this.money(k.monthly_revenue)}`, icon: "💰", color: "red", route: "query-report/Clinic Revenue Summary" },
+      { label: "Pending Appts", value: this.num(k.pending_appointments), icon: "📅", color: "green", route: "List/Patient Appointment" },
+      { label: "Low Stock", value: this.num(k.low_stock_items), icon: "📦", color: "orange", route: "List/Bin" },
+    ];
+    $("#nb-admin-kpis").html(cards.map(c => `
+      <div class="nb-kpi-card" data-admin-route="${this.esc(c.route)}">
+        <div class="nb-kpi-icon" style="background:var(--nb-primary)">${c.icon}</div>
+        <div class="nb-kpi-info">
+            <h4>${c.label}</h4>
+            <div class="nb-kpi-value">${this.esc(c.value)}</div>
+        </div>
+      </div>
+    `).join(""));
+  }
+
+  render_chart(chart) {
+    const labels = chart.labels || [];
+    const revenue = chart.revenue || [];
+    const expenses = chart.expenses || [];
+    const max = Math.max(1, ...revenue, ...expenses);
+    if (!labels.length) {
+      $("#nb-admin-chart").html(`<div class="nb-empty-soft">No financial data found.</div>`);
+      return;
+    }
+    const html = `<div style="display: flex; align-items: flex-end; height: 200px; gap: 10px; border-bottom: 1px solid var(--nb-border);">
+        ${labels.map((label, i) => {
+            const rh = Math.max(5, (revenue[i] / max) * 100);
+            const eh = Math.max(5, (expenses[i] / max) * 100);
+            return `
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <div style="display: flex; gap: 2px; align-items: flex-end; height: 100px;">
+                        <div style="width: 10px; height: ${rh}%; background: var(--nb-primary); border-radius: 2px 2px 0 0;"></div>
+                        <div style="width: 10px; height: ${eh}%; background: var(--nb-danger); border-radius: 2px 2px 0 0;"></div>
+                    </div>
+                    <span style="font-size: 10px; color: var(--nb-text-muted)">${label}</span>
+                </div>
+            `;
+        }).join("")}
+    </div>`;
+    $("#nb-admin-chart").html(html);
+  }
+
+  render_facility(facility) {
+    $("#nb-admin-facility").html(`
+      <div style="display: grid; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--nb-surface); border-radius: 8px;">
+            <span style="font-weight: 600;">Active Doctors</span>
+            <b style="font-size: 18px;">${this.num(facility.active_doctors)}</b>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--nb-surface); border-radius: 8px;">
+            <span style="font-weight: 600;">Service Units</span>
+            <b style="font-size: 18px;">${this.num(facility.rooms)}</b>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--nb-surface); border-radius: 8px;">
+            <span style="font-weight: 600;">Today Admissions</span>
+            <b style="font-size: 18px;">${this.num(facility.today_admissions)}</b>
+        </div>
+      </div>
+    `);
+  }
+
+  render_quick_cards(cards) {
+    $("#nb-admin-quick-cards").html(cards.map((c, i) => `
+      <section class="nb-card" style="display: flex; align-items: center; justify-content: space-between; padding: 20px;">
+        <div style="font-weight: 800; font-family: 'Outfit'; font-size: 16px;">${this.esc(c.label)}</div>
+        <button class="nb-btn nb-btn-primary" data-admin-route="${this.esc(this.route_string(c.route))}">${this.esc(c.button || "Open")}</button>
+      </section>
+    `).join(""));
+  }
+
+  render_list(selector, rows) {
+    if (!rows.length) {
+      $(selector).html(`<div class="nb-empty-soft">No records found.</div>`);
+      return;
+    }
+    $(selector).html(`
+        <div style="padding: 10px;">
+            ${rows.map(row => `
+                <div data-admin-route="${this.esc(this.route_string(row.route))}" 
+                     style="display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid var(--nb-border); cursor: pointer;">
+                    <div class="nb-avatar" style="width: 32px; height: 32px; font-size: 14px;">${this.initials(row.label || row.title)}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700;">${this.esc(row.label || row.title)}</div>
+                        <div style="font-size: 11px; color: var(--nb-text-muted)">${this.esc(row.subtitle || "")}</div>
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    `);
+  }
+
+  search_global(query) {
+    if (!query || query.length < 2) {
+      $("#nb-admin-search-results").hide();
+      return;
+    }
+    this.call("search_global", { query }, (rows) => {
+      rows = rows || [];
+      if (!rows.length) {
+        $("#nb-admin-search-results").html(`<div style="padding: 12px;">No results</div>`).show();
+        return;
+      }
+      $("#nb-admin-search-results").html(rows.map(row => `
+        <div class="nb-global-item" data-admin-route="${this.esc(this.route_string(row.route))}" style="padding: 12px; border-bottom: 1px solid var(--nb-border); cursor: pointer;">
+          <b style="display:block;">${this.esc(row.title || row.name)}</b>
+          <div style="font-size: 11px; color: var(--nb-text-muted)">${this.esc(row.type || "")}</div>
+        </div>
+      `).join("")).show();
+    });
+  }
+
+  open_settings() {
+    this.go_route("Form/NileByte Clinic Settings/NileByte Clinic Settings");
+  }
+
+  go_route(route) {
+    if (!route) return;
+    const parts = String(route).split("/").map(decodeURIComponent);
+    frappe.set_route(...parts);
+  }
+
+  route_string(route) {
+    if (!route) return "clinic-admin-dashboard";
+    if (Array.isArray(route)) return route.map(v => encodeURIComponent(v)).join("/");
+    return String(route);
+  }
+
+  initials(value) {
+    const words = String(value || "A").trim().split(/\s+/).slice(0, 2);
+    return words.map(w => w.charAt(0).toUpperCase()).join("") || "A";
+  }
+
+  num(value) {
+    return Number(value || 0).toLocaleString();
+  }
+
+  money(value) {
+    return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  esc(value) {
+    return frappe.utils.escape_html(String(value == null ? "" : value));
+  }
+}
+{
     $(document).on("click", ".nb-admin-nav button", (e) => {
       const $btn = $(e.currentTarget);
       $(".nb-admin-nav button").removeClass("active");

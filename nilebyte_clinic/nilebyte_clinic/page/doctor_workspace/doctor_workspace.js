@@ -27,222 +27,134 @@ class NBDoctorWorkspace {
 
   render() {
     $(this.page.body).html(`
-      <div class="nb-doc-app">
-        <aside class="nb-doc-sidebar">
-          <div class="nb-doc-brand">
-            <div class="nb-doc-logo">✦</div>
-            <div class="nb-doc-brand-name">Medica Clinic</div>
+      <div class="nb-clinic-app">
+        <aside class="nb-sidebar">
+          <div class="nb-brand">
+            <div class="nb-brand-logo">✦</div>
+            <div class="nb-brand-text">
+              <div class="nb-brand-title">ClinicWiser</div>
+              <div class="nb-brand-sub">Doctor Portal</div>
+            </div>
           </div>
-          <nav class="nb-doc-nav">
-            <button class="active" data-route="doctor-workspace"><span>⌂</span> Dashboard</button>
-            <button data-route="List/Patient Appointment"><span>☑</span> My Schedule</button>
-            <button data-route="List/Patient"><span>●</span> Patients</button>
-            <button data-action="tasks"><span>▣</span> Tasks</button>
-            <button data-action="telemedicine"><span>↗</span> Telemedicine</button>
-            <button data-route="query-report/Patient Visit History"><span>▥</span> Reports</button>
+          <nav class="nb-nav">
+            <button class="nb-nav-item active" data-route="doctor-workspace">
+              <span class="nb-nav-icon">⌂</span>
+              <span class="nb-nav-text">Dashboard</span>
+            </button>
+            <button class="nb-nav-item" data-route="List/Patient Appointment">
+              <span class="nb-nav-icon">☑</span>
+              <span class="nb-nav-text">My Schedule</span>
+            </button>
+            <button class="nb-nav-item" data-route="List/Patient">
+              <span class="nb-nav-icon">👤</span>
+              <span class="nb-nav-text">Patients</span>
+            </button>
+            <button class="nb-nav-item" data-action="tasks">
+              <span class="nb-nav-icon">▣</span>
+              <span class="nb-nav-text">Tasks</span>
+            </button>
+            <button class="nb-nav-item" data-route="query-report/Patient Visit History">
+              <span class="nb-nav-icon">▥</span>
+              <span class="nb-nav-text">Reports</span>
+            </button>
           </nav>
         </aside>
 
-        <main class="nb-doc-shell">
-          <header class="nb-doc-topbar">
-            <div class="nb-doc-global-search">
-              <span>⌕</span>
-              <input id="nb-doc-search" placeholder="Search patients..." autocomplete="off" />
-              <div id="nb-doc-search-results" class="nb-doc-search-results"></div>
+        <main class="nb-main">
+          <header class="nb-topbar">
+            <div class="nb-page-title">
+              <h1>Doctor Dashboard</h1>
+              <p>Welcome back, ${this.esc(frappe.session.user_fullname || "Doctor")}</p>
             </div>
-            <div class="nb-doc-user">
-              <div class="nb-doc-bell">🔔<b>2</b></div>
-              <div class="nb-doc-avatar">DR</div>
-              <div>
-                <strong>${this.esc(frappe.session.user_fullname || frappe.session.user || "Doctor")}</strong>
-                <small>Doctor</small>
+            <div class="nb-top-actions">
+              <div class="nb-search-bar">
+                <span class="nb-search-icon">⌕</span>
+                <input id="nb-doc-search" placeholder="Search patients..." autocomplete="off" />
+                <div id="nb-doc-search-results" class="nb-doc-search-results"></div>
               </div>
-              <span>⌄</span>
+              <div class="nb-user-profile">
+                <div class="nb-avatar">${this.initials(frappe.session.user_fullname || "DR")}</div>
+              </div>
             </div>
           </header>
 
-          <section class="nb-doc-content">
-            <div id="nb-doc-stats" class="nb-doc-stats"></div>
+          <div class="nb-content nb-fade-in">
+            <div id="nb-doc-stats" class="nb-kpis"></div>
 
-            <div class="nb-doc-grid nb-doc-grid-top">
-              <section class="nb-doc-card nb-doc-appointments-card">
-                <div class="nb-doc-card-head"><h3>Today’s Appointments</h3><span>•••</span></div>
-                <div id="nb-doc-queue" class="nb-doc-appointments"><div class="nb-doc-empty">Loading queue...</div></div>
+            <div class="nb-grid nb-grid-2">
+              <section class="nb-card">
+                <div class="nb-card-header">
+                  <h3>Today’s Appointments</h3>
+                  <button class="nb-btn nb-btn-secondary btn-xs">•••</button>
+                </div>
+                <div id="nb-doc-queue" class="nb-doc-appointments">
+                  <div class="nb-doc-empty">Loading queue...</div>
+                </div>
               </section>
 
-              <section class="nb-doc-card nb-doc-patient-card">
-                <div class="nb-doc-card-head"><h3>Patient Overview</h3><span>•••</span></div>
-                <div id="nb-doc-patient-overview"><div class="nb-doc-empty">Select a patient from today’s queue.</div></div>
+              <section class="nb-card">
+                <div class="nb-card-header">
+                  <h3>Patient Overview</h3>
+                  <button class="nb-btn nb-btn-secondary btn-xs">•••</button>
+                </div>
+                <div id="nb-doc-patient-overview">
+                  <div class="nb-doc-empty">Select a patient from today’s queue.</div>
+                </div>
               </section>
             </div>
 
-            <div class="nb-doc-grid nb-doc-action-grid">
-              <section class="nb-doc-card nb-doc-action-card">
-                <div class="nb-doc-action-title"><span>🩺</span><h3>Start Consultation</h3></div>
-                <button class="nb-doc-field-btn" id="nb-begin-visit">Begin Patient Visit</button>
-                <button class="nb-doc-green" id="nb-start-now">Start Now</button>
+            <div class="nb-grid nb-grid-3">
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>Actions</h3></div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                  <button class="nb-btn nb-btn-primary" id="nb-begin-visit">🩺 Start Consultation</button>
+                  <button class="nb-btn nb-btn-secondary" id="nb-create-rx">💊 New Prescription</button>
+                  <button class="nb-btn nb-btn-secondary" id="nb-request-tests">🔬 Order Lab Tests</button>
+                </div>
               </section>
 
-              <section class="nb-doc-card nb-doc-action-card">
-                <div class="nb-doc-action-title"><span>💊</span><h3>New Prescription</h3></div>
-                <button class="nb-doc-field-btn" id="nb-create-rx-link">Create Rx</button>
-                <button class="nb-doc-blue" id="nb-create-rx">Create Rx</button>
-              </section>
-
-              <section class="nb-doc-card nb-doc-action-card">
-                <div class="nb-doc-action-title"><span>🔬</span><h3>Order Lab Tests</h3></div>
-                <button class="nb-doc-field-btn" id="nb-request-tests-link">Request Tests</button>
-                <div class="nb-doc-lines"><i></i><i></i><i></i></div>
-              </section>
-
-              <section class="nb-doc-card nb-doc-tasks-card">
-                <div class="nb-doc-card-head"><h3>My Tasks</h3><span>•••</span></div>
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>My Tasks</h3></div>
                 <div id="nb-doc-tasks"></div>
               </section>
-            </div>
 
-            <div class="nb-doc-grid nb-doc-bottom-grid">
-              <section class="nb-doc-card nb-doc-medical-stats">
-                <div class="nb-doc-card-head"><h3>Medical Stats</h3><span>•••</span></div>
+              <section class="nb-card">
+                <div class="nb-card-header"><h3>Medical Stats</h3></div>
                 <div id="nb-doc-medical-stats"></div>
               </section>
-
-              <section class="nb-doc-card nb-doc-notes-card">
-                <div class="nb-doc-card-head"><h3>Quick Notes</h3><span>•••</span></div>
-                <div id="nb-doc-notes"></div>
-              </section>
             </div>
-          </section>
+          </div>
         </main>
       </div>
-    `);
-
-    this.add_styles();
-  }
-
-  add_styles() {
-    if ($("#nb-doctor-style").length) return;
-    $("head").append(`
-      <style id="nb-doctor-style">
-        body[data-route="doctor-workspace"] .layout-main-section-wrapper,
-        body[data-route="doctor-workspace"] .layout-main-section { padding:0 !important; margin:0 !important; }
-        .nb-doc-app { --blue:#075cc6; --blue2:#1d71d5; --deep:#0b2454; --muted:#667899; --line:#dbe5f2; --soft:#f4f8fd; display:flex; min-height:calc(100vh - 92px); margin:-15px -15px 0; background:#eef4fb; color:#0f2447; font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-        .nb-doc-sidebar { width:235px; flex:0 0 235px; background:linear-gradient(180deg,#0962c8,#074fb1); color:#fff; box-shadow:8px 0 24px rgba(8,65,140,.18); }
-        .nb-doc-brand { height:86px; display:flex; align-items:center; gap:12px; padding:0 28px; border-bottom:1px solid rgba(255,255,255,.13); }
-        .nb-doc-logo { width:38px; height:38px; display:grid; place-items:center; font-size:24px; font-weight:900; }
-        .nb-doc-brand-name { font-size:21px; font-weight:800; white-space:nowrap; }
-        .nb-doc-nav { padding:18px 14px; display:flex; flex-direction:column; gap:6px; }
-        .nb-doc-nav button { border:0; background:transparent; color:#fff; text-align:left; padding:13px 16px; border-radius:8px; display:flex; gap:14px; align-items:center; font-size:15px; font-weight:700; opacity:.94; }
-        .nb-doc-nav button:hover, .nb-doc-nav button.active { background:rgba(255,255,255,.14); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
-        .nb-doc-nav span { width:24px; font-size:22px; display:inline-grid; place-items:center; }
-        .nb-doc-shell { flex:1; min-width:0; }
-        .nb-doc-topbar { height:86px; display:flex; align-items:center; justify-content:space-between; padding:0 34px; background:linear-gradient(90deg,#085bc4,#0756ba,#0c62c9); box-shadow:0 3px 16px rgba(20,70,130,.2); }
-        .nb-doc-global-search { position:relative; width:min(620px,50vw); height:48px; background:#f9fbff; border:1px solid rgba(255,255,255,.65); border-radius:8px; display:flex; align-items:center; gap:12px; padding:0 14px; box-shadow:0 8px 20px rgba(0,0,0,.12) inset, 0 6px 18px rgba(0,0,0,.07); }
-        .nb-doc-global-search span { color:#486386; font-size:28px; line-height:1; }
-        .nb-doc-global-search input { border:0; outline:0; background:transparent; width:100%; font-size:15px; color:#1f365a; }
-        .nb-doc-search-results { display:none; position:absolute; top:53px; left:0; right:0; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; z-index:100; box-shadow:0 16px 36px rgba(20,50,90,.22); }
-        .nb-doc-search-item { padding:12px 14px; border-bottom:1px solid #eef3fa; cursor:pointer; }
-        .nb-doc-search-item:hover { background:#f4f8ff; }
-        .nb-doc-user { display:flex; align-items:center; gap:12px; color:#fff; }
-        .nb-doc-user strong { display:block; font-size:15px; line-height:1.1; }
-        .nb-doc-user small { display:block; color:#dbe9ff; font-size:12px; margin-top:3px; }
-        .nb-doc-avatar { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; background:#fff; color:#075cc6; font-weight:900; border:3px solid rgba(255,255,255,.55); box-shadow:0 5px 15px rgba(0,0,0,.18); }
-        .nb-doc-bell { position:relative; font-size:24px; }
-        .nb-doc-bell b { position:absolute; right:-8px; top:-8px; background:#f04b46; color:#fff; border-radius:99px; min-width:18px; height:18px; padding:0 4px; font-size:11px; display:grid; place-items:center; }
-        .nb-doc-content { padding:18px 22px 34px; }
-        .nb-doc-stats { display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:12px; margin-bottom:16px; }
-        .nb-doc-stat { background:#fff; border:1px solid var(--line); border-radius:9px; padding:13px 14px; display:flex; align-items:center; gap:12px; min-height:88px; box-shadow:0 5px 14px rgba(25,55,100,.08); cursor:pointer; transition:.14s ease; }
-        .nb-doc-stat:hover { transform:translateY(-1px); box-shadow:0 9px 22px rgba(25,55,100,.13); }
-        .nb-doc-stat-icon { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; color:#fff; font-size:21px; flex:0 0 42px; }
-        .nb-doc-stat h4 { margin:0 0 4px; font-size:12px; font-weight:700; color:#2c3f62; }
-        .nb-doc-stat b { display:block; font-size:24px; color:#0d2447; line-height:1; }
-        .nb-doc-stat small { display:block; margin-top:6px; color:var(--muted); }
-        .nb-doc-grid { display:grid; gap:14px; }
-        .nb-doc-grid-top { grid-template-columns:1.05fr 1fr; align-items:start; }
-        .nb-doc-action-grid { grid-template-columns:1fr 1fr 1fr 1.2fr; margin-top:14px; align-items:start; }
-        .nb-doc-bottom-grid { grid-template-columns:1fr 1fr; margin-top:14px; align-items:start; max-width:930px; }
-        .nb-doc-card { background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 5px 14px rgba(25,55,100,.09); overflow:hidden; }
-        .nb-doc-card-head { height:56px; padding:0 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
-        .nb-doc-card-head h3 { margin:0; font-size:18px; color:#0c244b; font-weight:800; }
-        .nb-doc-card-head span { color:#9aaaC2; letter-spacing:3px; font-size:20px; }
-        .nb-doc-appointments { padding:10px 18px 18px; min-height:250px; }
-        .nb-doc-appt-row { display:grid; grid-template-columns:86px 1fr; align-items:center; border-bottom:1px solid #e9eef6; min-height:54px; gap:14px; }
-        .nb-doc-appt-time { color:#32486c; font-weight:700; display:flex; gap:6px; align-items:center; }
-        .nb-doc-appt-time:before { content:"•"; color:#8495ad; font-size:18px; }
-        .nb-doc-appt-body { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:11px 14px; border-radius:5px; cursor:pointer; font-weight:800; color:#0e2449; }
-        .nb-doc-appt-body small { display:block; font-weight:600; color:#4f6283; margin-top:2px; }
-        .nb-doc-appt-body .status { font-weight:800; }
-        .nb-doc-appt-body.waiting { background:#ffeab4; border:1px solid #ffd674; }
-        .nb-doc-appt-body.with-doctor { background:#d8ebff; border:1px solid #8dc0ff; }
-        .nb-doc-appt-body.completed { background:#dff5e6; border:1px solid #95d8a8; }
-        .nb-doc-appt-body.cancelled, .nb-doc-appt-body.no-show { background:#ffe1df; border:1px solid #ffaaa5; }
-        .nb-doc-appt-body.selected { outline:3px solid rgba(7,92,198,.22); }
-        .nb-doc-patient-card { min-height:326px; }
-        .nb-doc-patient-box { margin:16px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#f7faff; }
-        .nb-doc-patient-main { padding:16px; display:flex; gap:15px; align-items:flex-start; background:linear-gradient(100deg,#f9fbff,#eef5ff); }
-        .nb-doc-patient-photo { width:74px; height:74px; border-radius:50%; background:linear-gradient(135deg,#e5edf9,#cfdcf0); display:grid; place-items:center; color:#0a5dc8; font-weight:900; font-size:25px; border:3px solid #fff; box-shadow:0 4px 12px rgba(20,50,90,.15); }
-        .nb-doc-patient-info h2 { margin:6px 0 3px; color:#0d2447; font-size:24px; }
-        .nb-doc-patient-info p { margin:0 0 8px; color:#556986; }
-        .nb-doc-patient-info strong { display:block; margin-top:6px; font-size:16px; }
-        .nb-doc-patient-actions { display:flex; flex-wrap:wrap; gap:0; padding:12px 18px; background:#fff; border-top:1px solid var(--line); }
-        .nb-doc-patient-actions button { border:0; background:#fff; color:#24558e; font-weight:800; padding:7px 10px; border-right:1px solid #dce5f2; }
-        .nb-doc-patient-actions button:last-child { border-right:0; }
-        .nb-doc-action-card { padding:16px; min-height:160px; }
-        .nb-doc-action-title { display:flex; gap:10px; align-items:center; margin-bottom:22px; }
-        .nb-doc-action-title span { color:#0b61ca; font-size:31px; }
-        .nb-doc-action-title h3 { margin:0; font-size:19px; color:#0c244b; }
-        .nb-doc-field-btn { width:100%; border:1px solid var(--line); background:#fff; border-radius:6px; box-shadow:0 3px 8px rgba(25,55,100,.1); height:42px; color:#174778; font-weight:800; }
-        .nb-doc-green, .nb-doc-blue { margin:14px auto 0; border:0; height:36px; border-radius:5px; color:#fff; display:block; width:70%; font-weight:800; box-shadow:0 5px 12px rgba(25,55,100,.16); }
-        .nb-doc-green { background:#49b16a; }
-        .nb-doc-blue { background:#1266c8; }
-        .nb-doc-lines { padding:14px 35px; }
-        .nb-doc-lines i { display:block; height:4px; background:#e3e9f2; border-radius:99px; margin:8px 0; }
-        .nb-doc-task { display:grid; grid-template-columns:28px 1fr auto; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid #e8eef6; }
-        .nb-doc-task i { color:#0b67cf; font-style:normal; font-size:18px; }
-        .nb-doc-task b { font-size:14px; }
-        .nb-doc-task span { color:#bf6b5e; font-size:13px; }
-        .nb-doc-stat-list, .nb-doc-notes-list { margin:14px; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
-        .nb-doc-stat-line, .nb-doc-note-line { display:grid; grid-template-columns:34px 1fr auto; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid #e8eef6; }
-        .nb-doc-stat-line:last-child, .nb-doc-note-line:last-child { border-bottom:0; }
-        .nb-doc-stat-line i, .nb-doc-note-line i { font-style:normal; width:26px; height:26px; border-radius:50%; display:grid; place-items:center; color:#fff; background:#2174d5; font-weight:800; }
-        .nb-doc-stat-line b { font-size:21px; color:#0d2447; margin-right:8px; }
-        .nb-doc-note-actions { text-align:right; padding:9px 14px; border-top:1px solid var(--line); }
-        .nb-doc-note-actions button { border:1px solid var(--line); background:#fff; color:#1d65bd; border-radius:5px; font-weight:800; padding:6px 13px; }
-        .nb-doc-empty { color:var(--muted); text-align:center; padding:30px; }
-        .nb-doc-muted { color:var(--muted); }
-        @media(max-width:1200px){ .nb-doc-sidebar{width:86px;flex-basis:86px}.nb-doc-brand-name,.nb-doc-nav button{font-size:0}.nb-doc-nav span{font-size:24px}.nb-doc-topbar{padding:0 18px}.nb-doc-stats{grid-template-columns:repeat(3,1fr)}.nb-doc-grid-top,.nb-doc-action-grid,.nb-doc-bottom-grid{grid-template-columns:1fr}.nb-doc-global-search{width:48vw} }
-        @media(max-width:760px){ .nb-doc-app{display:block;margin:0}.nb-doc-sidebar{display:none}.nb-doc-topbar{height:auto;gap:12px;flex-direction:column;align-items:stretch;padding:12px}.nb-doc-global-search{width:100%}.nb-doc-content{padding:12px}.nb-doc-stats{grid-template-columns:1fr 1fr}.nb-doc-user{justify-content:flex-end}.nb-doc-appt-row{grid-template-columns:1fr}.nb-doc-appt-time{padding-top:10px} }
-      </style>
     `);
   }
 
   bind_events() {
-    $(document).on("click", ".nb-doc-nav button", (e) => {
+    $(this.wrapper).on("click", ".nb-nav-item", (e) => {
       const route = $(e.currentTarget).data("route");
       const action = $(e.currentTarget).data("action");
       if (route) this.go(route);
       if (action === "tasks") frappe.set_route("List", "ToDo");
-      if (action === "telemedicine") frappe.msgprint("Telemedicine shortcuts can be connected when your Telemedicine module is enabled.");
     });
 
-    $(document).on("click", ".nb-doc-appt-body", (e) => {
+    $(this.wrapper).on("click", ".nb-doc-appt-body", (e) => {
       const appointment = $(e.currentTarget).data("appointment");
       const patient = $(e.currentTarget).data("patient");
       this.select_patient(appointment, patient);
     });
 
-    $("#nb-begin-visit, #nb-start-now").on("click", () => this.start_visit());
-    $("#nb-create-rx, #nb-create-rx-link").on("click", () => this.open_prescription_dialog());
-    $("#nb-request-tests-link").on("click", () => this.open_lab_dialog());
+    $("#nb-begin-visit").on("click", () => this.start_visit());
+    $("#nb-create-rx").on("click", () => this.open_prescription_dialog());
+    $("#nb-request-tests").on("click", () => this.open_lab_dialog());
 
-    $(document).on("click", "#nb-doc-open-patient", () => {
+    $(this.wrapper).on("click", "#nb-doc-open-patient", () => {
       if (this.active_patient) frappe.set_route("Form", "Patient", this.active_patient);
     });
-    $(document).on("click", "#nb-doc-clinical-notes", () => this.open_visit_dialog());
-    $(document).on("click", "#nb-doc-prescribe", () => this.open_prescription_dialog());
-    $(document).on("click", "#nb-doc-labs", () => this.open_lab_dialog());
-    $(document).on("click", "#nb-doc-history", () => this.open_patient_history());
-    $(document).on("click", "#nb-doc-add-note", () => this.add_note_dialog());
+    $(this.wrapper).on("click", "#nb-doc-clinical-notes", () => this.open_visit_dialog());
+    $(this.wrapper).on("click", "#nb-doc-prescribe", () => this.open_prescription_dialog());
+    $(this.wrapper).on("click", "#nb-doc-labs", () => this.open_lab_dialog());
+    $(this.wrapper).on("click", "#nb-doc-history", () => this.open_patient_history());
+    $(this.wrapper).on("click", "#nb-doc-add-note", () => this.add_note_dialog());
 
     $("#nb-doc-search").on("input", () => {
       clearTimeout(this.search_timer);
@@ -251,7 +163,7 @@ class NBDoctorWorkspace {
     });
 
     $(document).on("click", (e) => {
-      if (!$(e.target).closest(".nb-doc-global-search").length) {
+      if (!$(e.target).closest(".nb-search-bar").length) {
         $("#nb-doc-search-results").hide();
       }
     });
