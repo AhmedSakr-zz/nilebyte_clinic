@@ -77,6 +77,7 @@ class NBReceptionWorkspace {
                 <div id="nb-global-results" class="nb-global-results"></div>
               </div>
               <div style="display:flex; gap:10px;">
+                <button class="nb-btn nb-btn-secondary" id="nb-header-collect">Collect Payment</button>
                 <button class="nb-btn nb-btn-secondary" id="nb-header-book">Book Appt</button>
                 <button class="nb-btn nb-btn-primary" id="nb-new-patient">+ New Patient</button>
               </div>
@@ -195,6 +196,7 @@ class NBReceptionWorkspace {
 
     $("#nb-open-calendar").on("click", () => frappe.set_route("List", "Patient Appointment"));
     $("#nb-header-book").on("click", () => this.book_appointment_dialog());
+    $("#nb-header-collect").on("click", () => this.collect_payment_dialog());
     $("#nb-register-walkin").on("click", () => this.register_walkin());
     $("#nb-new-patient").on("click", () => this.new_patient_dialog());
 
@@ -340,8 +342,9 @@ class NBReceptionWorkspace {
               <td><span class="nb-badge nb-badge-blue">${this.esc(row.status)}</span></td>
               <td>
                 <div style="display:flex; gap:5px;">
-                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="check_in" data-name="${this.esc(row.name)}">Arrived</button>
-                  <button class="nb-btn nb-btn-primary btn-xs" data-action="invoice" data-name="${this.esc(row.name)}">Invoice</button>
+                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="mark_arrived" data-name="${this.esc(row.name)}">Arrived</button>
+                  <button class="nb-btn nb-btn-secondary btn-xs" data-action="send_to_doctor" data-name="${this.esc(row.name)}">Send</button>
+                  <button class="nb-btn nb-btn-primary btn-xs" data-action="create_invoice" data-name="${this.esc(row.name)}">Invoice</button>
                 </div>
               </td>
             </tr>
@@ -367,10 +370,13 @@ class NBReceptionWorkspace {
           <div style="font-weight:700;">${this.esc(r.patient_name || r.patient)}</div>
           <div style="font-size:11px; color:var(--nb-text-muted);">${this.esc(r.name)}</div>
         </div>
-        <button class="nb-btn nb-btn-primary btn-xs" data-action="invoice" data-name="${this.esc(r.name)}">Invoice</button>
+        <div style="display:flex; gap:5px;">
+            ${r.invoice ? `<button class="nb-btn nb-btn-secondary btn-xs" data-action="collect" data-invoice="${this.esc(r.invoice)}">Collect</button>` : `<button class="nb-btn nb-btn-primary btn-xs" data-action="invoice" data-name="${this.esc(r.name)}">Invoice</button>`}
+        </div>
       </div>
     `).join(""));
     $("#nb-billing-list [data-action='invoice']").on("click", (e) => this.queue_action("create_invoice", $(e.currentTarget).data("name")));
+    $("#nb-billing-list [data-action='collect']").on("click", (e) => this.collect_payment_dialog($(e.currentTarget).data("invoice")));
   }
 
   render_today_stats(data) {
@@ -397,7 +403,7 @@ class NBReceptionWorkspace {
       $(target).html(rows.map(p => `
         <div class="nb-global-item" data-patient="${this.esc(p.name)}" style="padding:10px; cursor:pointer; border-bottom:1px solid var(--nb-border);">
           <b>${this.esc(p.patient_name || p.name)}</b>
-          <div style="font-size:11px; color:var(--nb-text-muted);">${this.esc(p.name)}</div>
+          <div style="font-size:11px; color:var(--nb-text-muted);">${this.esc(p.name)} - ${this.esc(p.mobile || "")}</div>
         </div>
       `).join("")).show();
       $(`${target} .nb-global-item`).on("click", (e) => {
@@ -442,6 +448,31 @@ class NBReceptionWorkspace {
         this.call("book_appointment", values, () => {
           d.hide();
           frappe.show_alert({ message: "Appointment booked successfully", indicator: "green" });
+          this.load_all(false);
+        });
+      },
+    });
+    d.show();
+  }
+
+  collect_payment_dialog(invoice = null) {
+    const d = new frappe.ui.Dialog({
+      title: "Collect Payment",
+      fields: [
+        { fieldname: "invoice", label: "Sales Invoice", fieldtype: "Link", options: "Sales Invoice", reqd: 1, default: invoice },
+        { fieldname: "mode_of_payment", label: "Mode of Payment", fieldtype: "Link", options: "Mode of Payment", reqd: 1 },
+        { fieldname: "amount", label: "Amount", fieldtype: "Currency", reqd: 1 },
+        { fieldname: "reference", label: "Reference No", fieldtype: "Data" },
+      ],
+      primary_action_label: "Submit Payment",
+      primary_action: (values) => {
+        this.call("collect_payment", values, (res) => {
+          d.hide();
+          frappe.msgprint({
+            title: "Payment Collected",
+            indicator: "green",
+            message: `${this.esc(res.message)}<br><br><a class="btn btn-primary" href="/app/payment-entry/${encodeURIComponent(res.payment_entry)}">View Payment Entry</a>`,
+          });
           this.load_all(false);
         });
       },
