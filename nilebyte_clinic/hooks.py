@@ -26,7 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/nilebyte_clinic/css/nilebyte_clinic.css"
-# app_include_js = "/assets/nilebyte_clinic/js/nilebyte_clinic.js"
+app_include_js = ["/assets/nilebyte_clinic/js/workspace_redirects.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/nilebyte_clinic/css/nilebyte_clinic.css"
@@ -43,7 +43,7 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Workspace" : "public/js/workspace_redirects.js"}
+# doctype_js = {"Workspace" : "public/js/workspace_redirects.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
