@@ -26,7 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 app_include_css = "/assets/nilebyte_clinic/css/nb_clinic_ui.css"
-app_include_js = ["/assets/nilebyte_clinic/js/nb_redirects_v2.js"]
+app_include_js = ["/assets/nilebyte_clinic/js/nb_redirects_v3.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/nilebyte_clinic/css/nilebyte_clinic.css"
