@@ -9,8 +9,6 @@ frappe.router.on('change', () => {
     
     // Doctor
     if (route_str.includes('doctor') && !route_str.includes('doctor-workspace')) {
-        // Catch /app/doctor, /app/workspaces/doctor, etc.
-        // But avoid redirecting if it's a specific doctype or form (unless it's the workspace)
         if (route_str === 'doctor' || route_str.includes('workspace')) {
              frappe.set_route('doctor-workspace');
         }
@@ -32,22 +30,24 @@ frappe.router.on('change', () => {
 
     // Nursing Station
     if (route_str.includes('nursing') && !route_str.includes('nursing-station')) {
-        // Catch /app/nursing or /app/workspaces/nursing
+        // Any route starting with nursing or nursing/something that isn't the station
         frappe.set_route('nursing-station');
     }
 
     // Laboratory
     if (route_str.includes('lab') && !route_str.includes('lab-dashboard')) {
-        if (route_str === 'lab' || route_str.includes('workspace') || route_str.includes('dashboard')) {
-            frappe.set_route('lab-dashboard');
+        // Covers 'lab', 'laboratory', and 'workspaces/lab'
+        if (route_str.includes('lab') || route_str.includes('laboratory')) {
+            // Only redirect if it's the base route or a workspace/dashboard container
+            if (route_str === 'lab' || route_str === 'laboratory' || route_str.includes('workspace') || route_str.includes('dashboard')) {
+                frappe.set_route('lab-dashboard');
+            }
         }
     }
 
     // Pharmacy
     if (route_str.includes('pharmacy') && !route_str.includes('pharmacy-dashboard')) {
-        if (route_str === 'pharmacy' || route_str.includes('workspace')) {
-            frappe.set_route('pharmacy-dashboard');
-        }
+        frappe.set_route('pharmacy-dashboard');
     }
 });
 
