@@ -7,15 +7,16 @@ frappe.router.on('change', () => {
     if (route) {
         const route_str = route.join('/');
         
-        if (route_str === 'Workspace/Doctor' || route_str === 'doctor') {
+        // Match the Workspaces (plural) route found in your console!
+        if (route_str === 'Workspaces/Doctor' || route_str === 'Workspace/Doctor' || route_str === 'doctor') {
             console.log("Redirecting to Doctor Workspace Page...");
             frappe.set_route('doctor-workspace');
         } 
-        else if (route_str === 'Workspace/Reception' || route_str === 'reception') {
+        else if (route_str === 'Workspaces/Reception' || route_str === 'Workspace/Reception' || route_str === 'reception') {
             console.log("Redirecting to Reception Workspace Page...");
             frappe.set_route('reception-workspace');
         } 
-        else if (route_str === 'Workspace/Clinic Admin' || route_str === 'clinic-admin') {
+        else if (route_str === 'Workspaces/Clinic Admin' || route_str === 'Workspace/Clinic Admin' || route_str === 'clinic-admin') {
             console.log("Redirecting to Clinic Admin Dashboard Page...");
             frappe.set_route('clinic-admin-dashboard');
         }
